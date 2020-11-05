@@ -45,14 +45,14 @@ fi
 cd ${BUILD_ARTIFACTS_FOLDER}
 ls -lha
 
-MD5_SUM=$(md5sum ${RELEASE_ASSET_NAME}${EXT} | cut -d ' ' -f 1)
+MD5_SUM=$(md5sum ${BINARY_NAME}${EXT} | cut -d ' ' -f 1)
 
 # update binary and checksum
 curl \
   --fail \
   -X POST \
-  --data-binary @${RELEASE_ASSET_NAME}${EXT} \
-  -H 'Content-Type: application/gzip' \
+  --data-binary @${BINARY_NAME}${EXT} \
+  -H 'Content-Type: application/octet-stream' \
   -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" \
   "${RELEASE_ASSETS_UPLOAD_URL}?name=${RELEASE_ASSET_NAME}${EXT}"
 echo $?
