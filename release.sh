@@ -45,24 +45,16 @@ fi
 cd ${BUILD_ARTIFACTS_FOLDER}
 ls -lha
 
-# compress and package binary, then calculate checksum
-RELEASE_ASSET_EXT='.tar.gz'
-if [ ${INPUT_GOOS} == 'windows' ]; then
-RELEASE_ASSET_EXT='.zip'
-zip -vr ${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT} *
-else
-tar cvfz ${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT} *
-fi
-MD5_SUM=$(md5sum ${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT} | cut -d ' ' -f 1)
+MD5_SUM=$(md5sum ${RELEASE_ASSET_NAME}${EXT} | cut -d ' ' -f 1)
 
 # update binary and checksum
 curl \
   --fail \
   -X POST \
-  --data-binary @${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT} \
+  --data-binary @${RELEASE_ASSET_NAME}${EXT} \
   -H 'Content-Type: application/gzip' \
   -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" \
-  "${RELEASE_ASSETS_UPLOAD_URL}?name=${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT}"
+  "${RELEASE_ASSETS_UPLOAD_URL}?name=${RELEASE_ASSET_NAME}${EXT}"
 echo $?
 
 if [ ${INPUT_MD5SUM^^} == 'TRUE' ]; then
@@ -72,6 +64,6 @@ curl \
   --data ${MD5_SUM} \
   -H 'Content-Type: text/plain' \
   -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" \
-  "${RELEASE_ASSETS_UPLOAD_URL}?name=${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT}.md5"
+  "${RELEASE_ASSETS_UPLOAD_URL}?name=${RELEASE_ASSET_NAME}${EXT}.md5"
 echo $?
 fi
