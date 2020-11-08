@@ -47,6 +47,26 @@ ls -lha
 
 MD5_SUM=$(md5sum ${BINARY_NAME}${EXT} | cut -d ' ' -f 1)
 
+
+# compress and package binary, then calculate checksum
+RELEASE_ASSET_EXT='.tar.gz'
+if [ ${INPUT_GOOS} == 'windows' ]; then
+RELEASE_ASSET_EXT='.zip'
+zip -vr ${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT} *
+else
+tar cvfz ${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT} *
+fi
+
+# update binary and checksum
+curl \
+  --fail \
+  -X POST \
+  --data-binary @${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT} \
+  -H 'Content-Type: application/gzip' \
+  -H "Authorization: Bearer ${INPUT_GITHUB_TOKEN}" \
+  "${RELEASE_ASSETS_UPLOAD_URL}?name=${RELEASE_ASSET_NAME}${RELEASE_ASSET_EXT}"
+echo $?
+
 # update binary and checksum
 curl \
   --fail \
